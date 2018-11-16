@@ -19,18 +19,21 @@ public class Screen extends JPanel implements Runnable {
 
     //
     public static final int WIDTH = 800, HEIGHT = 800, blockSize = 20;
-    private Thread thread;
+    private Thread thread;private int ticks = 0;
+    private movementHandler key;
+    
+    // Game state
     private boolean running = false;
 
-    //Variables that are defying snake
+    // Variables that are defying snake
     private BodyPart b;
     private ArrayList<BodyPart> snakeBody;
     private int snakeSize = 4;
     private int xC, yC = blockSize;
 
+    // Snake directions
     private boolean right = true, left = false, up = false, down = false;
-    private int ticks = 0;
-    private movementHandler key;
+    
     public Screen() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
@@ -51,7 +54,7 @@ public class Screen extends JPanel implements Runnable {
     }
 
     public void tick() {
-        //Length of the size = 0, create new snake body
+        // If length of the size = 0, create new snake body
         if (snakeBody.size() == 0) {
             b = new BodyPart(xC, yC, blockSize);
             snakeBody.add(b);
@@ -88,22 +91,25 @@ public class Screen extends JPanel implements Runnable {
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
         // Draw snakeBody;
-        g.setColor(Color.WHITE);
+        g.setColor(new Color(16737792));
         for (int i = 0; i < snakeBody.size(); i++) {
             snakeBody.get(i).draw(g);
         }
-
+        
+        // Draw x-axis grid 
         g.setColor(new Color(1052945));
         for (int i = 0; i < WIDTH / blockSize; i++) {
             g.drawLine(i * blockSize, 0, i * blockSize, HEIGHT);
         }
+        
+        // Draw y-axis grid 
         for (int i = 0; i < HEIGHT / blockSize; i++) {
             g.drawLine(0, i * blockSize, WIDTH, i * blockSize);
         }
 
     }
 
-    //Runnable class
+    //Runnable class abstract method
     @Override
     public void run() {
         while (running) {
@@ -111,7 +117,7 @@ public class Screen extends JPanel implements Runnable {
             repaint();
         }
     }
-
+    //Snake steering
     private class movementHandler implements KeyListener {
 
         @Override
@@ -121,7 +127,7 @@ public class Screen extends JPanel implements Runnable {
                 case KeyEvent.VK_DOWN: 
                     if(!up){
                     down = true;
-                    up = false;
+                    left = false;
                     right = false;
                     } break;
                 case KeyEvent.VK_UP: 
