@@ -13,11 +13,24 @@ public class BodyPart {
     public void draw(Graphics g)
     {
         Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(new Color(16737792));
+        g2.setColor(Color.white);
         g2.fillRect(x*width, y*height, width, height);
     }
     
     public void tick(){
         
+    }
+      // SET/GET
+    public void setxCoordinate(int x){
+        this.x = x;
+    }
+    public void setyCoordinate(int y){
+        this.y = y;
+    }
+    public int getxCoordinate(){
+        return this.x;
+    }
+    public int getyCoordinate(){
+        return this.y;
     }
 }
