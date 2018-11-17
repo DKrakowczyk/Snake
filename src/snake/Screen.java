@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -43,6 +44,8 @@ public class Screen extends JPanel implements Runnable {
     private ArrayList<Food> foodList;
     private Random random;
 
+    private Vision[] vision;
+ 
     public Screen() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
@@ -53,9 +56,13 @@ public class Screen extends JPanel implements Runnable {
         snakeBody = new ArrayList<>();
         foodList = new ArrayList<>();
         random = new Random();
+        createVision();
+        
         // Random position of the snake
-        xC = random.nextInt((WIDTH / blockSize) - 1);
-        yC = random.nextInt((WIDTH / blockSize) - 1);
+//        xC = random.nextInt((WIDTH / blockSize) - 1);
+//        yC = random.nextInt((WIDTH / blockSize) - 1);
+          xC = 25;
+          yC = 25;
         start();
     }
 
@@ -63,6 +70,7 @@ public class Screen extends JPanel implements Runnable {
         running = true;
         thread = new Thread(this, "Game");
         thread.start();
+        
     }
 
     public void stop() {
@@ -75,13 +83,14 @@ public class Screen extends JPanel implements Runnable {
     }
 
     public void tick() {
-        createSnake();
         createFood();
         checkFoodCollected();
         checkBodyCollisions();
         checkBorderCollisions();
+        checkDanger();
+        checkFood();
         ticks++;
-        if (ticks > 300000) {
+        if (ticks > 700000) {
             if (right) {
                 xC++;
             }
@@ -98,13 +107,80 @@ public class Screen extends JPanel implements Runnable {
             ticks = 0;
             b = new BodyPart(xC, yC, blockSize);
             snakeBody.add(b);
-
+            
+          
+            createVision();
+            
+            
             if (snakeBody.size() > snakeSize) {
                 snakeBody.remove(0);
             }
         }
     }
 
+    public void createVision(){
+        vision = new Vision[6];
+            if (right) {
+            vision[0] = new Vision(xC,yC+1,blockSize);
+            vision[1] = new Vision(xC,yC+2,blockSize);
+            vision[2] = new Vision(xC+1,yC,blockSize);
+            vision[3] = new Vision(xC+2,yC,blockSize);
+            vision[4] = new Vision(xC,yC-1,blockSize);
+            vision[5] = new Vision(xC,yC-2,blockSize);
+            }
+            if (left) {
+            vision[0] = new Vision(xC,yC-1,blockSize);
+            vision[1] = new Vision(xC,yC-2,blockSize);
+            vision[2] = new Vision(xC-1,yC,blockSize);
+            vision[3] = new Vision(xC-2,yC,blockSize);
+            vision[4] = new Vision(xC,yC+1,blockSize);
+            vision[5] = new Vision(xC,yC+2,blockSize);
+            }
+            if (up) {
+            vision[0] = new Vision(xC-1,yC,blockSize);
+            vision[1] = new Vision(xC-2,yC,blockSize);
+            vision[2] = new Vision(xC,yC-1,blockSize);
+            vision[3] = new Vision(xC,yC-2,blockSize);
+            vision[4] = new Vision(xC+1,yC,blockSize);
+            vision[5] = new Vision(xC+2,yC,blockSize);
+            }
+            if (down) {
+            vision[0] = new Vision(xC+1,yC,blockSize);
+            vision[1] = new Vision(xC+2,yC,blockSize);
+            vision[2] = new Vision(xC,yC+1,blockSize);
+            vision[3] = new Vision(xC,yC+2,blockSize);
+            vision[4] = new Vision(xC-1,yC,blockSize);
+            vision[5] = new Vision(xC-2,yC,blockSize);
+            }
+        
+    }
+    
+    public void checkDanger(){
+        for(int i=0;i<vision.length;i++){
+        if(vision[i].getxCoordinate() < 0 || vision[i].getxCoordinate() > (WIDTH / blockSize) - 1 ||
+           vision[i].getyCoordinate() < 0 || vision[i].getyCoordinate() > (WIDTH / blockSize) - 1){
+            
+            vision[i-1].setDanger();
+        }
+        
+        else
+            vision[i].setSafe();
+        }
+    }
+    
+    public void checkFood() {
+
+        for (int i = 0; i < foodList.size(); i++) {
+            for (int j = 0; j < vision.length; j++) {
+                if (vision[j].getxCoordinate() == foodList.get(i).getxCoordinate() && vision[j].getyCoordinate() == foodList.get(i).getyCoordinate()) {
+                    vision[j].setFood();
+                   
+                }
+                    else
+                     vision[j].setNoFood();
+                }
+            }
+    }
     public void createSnake() {
         if (snakeBody.size() == 0) {
             b = new BodyPart(xC, yC, blockSize);
@@ -118,6 +194,7 @@ public class Screen extends JPanel implements Runnable {
             food = new Food(x, y, blockSize);
             foodList.add(food);
         }
+        
     }
     public void checkFoodCollected(){
         for (int i = 0; i < foodList.size(); i++) {
@@ -153,6 +230,11 @@ public class Screen extends JPanel implements Runnable {
         for (int i = 0; i < snakeBody.size(); i++) {
             snakeBody.get(i).draw(g);
         }
+     
+        for(int i =0; i< vision.length;i++){
+            vision[i].draw(g);
+        }
+        
 
         // Draw food
         for (int i = 0; i < foodList.size(); i++) {
