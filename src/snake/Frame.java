@@ -18,13 +18,12 @@ public class Frame extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Snake Game");
         setResizable(false);
-        
         init();
     }
     
     public void init(){
         setLayout(new GridLayout(1,1,0,0));
-        Screen s = new Screen();
+        Game s = new Game();
         add(s);
         pack();
         setVisible(true);

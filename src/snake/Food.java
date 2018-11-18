@@ -14,21 +14,17 @@ import java.awt.Graphics;
  */
 public class Food {
     
-    private int x,y,width,height;
+    private int x,y,tileSize;
     
     public Food(int x, int y, int tileSize){
         this.x = x;
         this.y = y;
-        width = tileSize;
-        height = tileSize;
+        this.tileSize = tileSize;
     }
     
-    public void tick(){
-        
-    }
     public void draw(Graphics g){
         g.setColor(Color.red);
-        g.fillOval(x*width, y*height, width, height);
+        g.fillOval(x*tileSize, y*tileSize, tileSize, tileSize);
     }
     // SET/GET
     public void setxCoordinate(int x){

@@ -2,31 +2,27 @@ package snake;
 import java.awt.*;
 public class Vision {
     
-    private int x, y, width, height;
+    private int x, y, tileSize;
     private boolean isInDanger, isFood;
     public Vision(int x, int y, int tileSize){
         this.x = x;
         this.y = y;
-        width = tileSize;
-        height = tileSize;
+        this.tileSize = tileSize;
         isInDanger = false;
         isFood = false;
     }
     
     public void draw(Graphics g)
     {
-        Graphics2D g2 = (Graphics2D) g;
-        
+        Graphics2D g2 = (Graphics2D) g;  
         g2.setColor(new Color(5028442));
         if(isInDanger)
-        g2.setColor(Color.ORANGE);
-        
+        g2.setColor(Color.ORANGE);   
         if(isFood)
         g2.setColor(new Color(9314446));
-        
-        g2.fillRect(x*width, y*height, width, height);
+        g2.fillRect(x*tileSize, y*tileSize, tileSize, tileSize);
     }
-      // SET/GET
+    // SET/GET
     public boolean isFood(){
         return this.isFood;
     }

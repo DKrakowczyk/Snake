@@ -19,7 +19,7 @@ import javax.swing.*;
  *
  * @author Dawid
  */
-public class Screen extends JPanel implements Runnable {
+public class Game extends JPanel implements Runnable {
 
     //
     public static final int WIDTH = 800, HEIGHT = 800, blockSize = 20;
@@ -45,24 +45,19 @@ public class Screen extends JPanel implements Runnable {
     private Random random;
 
     private Vision[] vision;
- 
-    public Screen() {
+    private boolean enableVision;
+    
+    
+    public Game() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
-
         key = new movementHandler();
         addKeyListener(key);
-
         snakeBody = new ArrayList<>();
         foodList = new ArrayList<>();
         random = new Random();
         createVision();
-        
-        // Random position of the snake
-//        xC = random.nextInt((WIDTH / blockSize) - 1);
-//        yC = random.nextInt((WIDTH / blockSize) - 1);
-          xC = 25;
-          yC = 25;
+        enableVision= false;
         start();
     }
 
@@ -72,52 +67,37 @@ public class Screen extends JPanel implements Runnable {
         thread.start();
         
     }
-
     public void stop() {
         running = false;
         try {
             thread.join();
         } catch (InterruptedException ex) {
-            Logger.getLogger(Screen.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void tick() {
+    public void loop() {
         createFood();
         checkFoodCollected();
         checkBodyCollisions();
         checkBorderCollisions();
+        
+        if(enableVision){
         checkDanger();
         checkFood();
+        }
+        
         ticks++;
-        if (ticks > 700000) {
-            if (right) {
-                xC++;
-            }
-            if (left) {
-                xC--;
-            }
-            if (up) {
-                yC--;
-            }
-            if (down) {
-                yC++;
-            }
-
+        if (ticks > 500000) { //500000 zmienic na jakas stala wynikajaca z procesora/czasu systemu dla stalych FPS
+            steering();
             ticks = 0;
-            b = new BodyPart(xC, yC, blockSize);
-            snakeBody.add(b);
-            
-          
+            createSnake();
             createVision();
-            
-            
-            if (snakeBody.size() > snakeSize) {
-                snakeBody.remove(0);
-            }
         }
     }
-
+  
+    
+    //--------------------VISION--------------------
     public void createVision(){
         vision = new Vision[6];
             if (right) {
@@ -154,47 +134,43 @@ public class Screen extends JPanel implements Runnable {
             }
         
     }
-    
     public void checkDanger(){
         for(int i=0;i<vision.length;i++){
         if(vision[i].getxCoordinate() < 0 || vision[i].getxCoordinate() > (WIDTH / blockSize) - 1 ||
-           vision[i].getyCoordinate() < 0 || vision[i].getyCoordinate() > (WIDTH / blockSize) - 1){
-            
-            vision[i-1].setDanger();
-        }
-        
+           vision[i].getyCoordinate() < 0 || vision[i].getyCoordinate() > (WIDTH / blockSize) - 1)      
+            vision[i-1].setDanger(); 
         else
             vision[i].setSafe();
-        }
-    }
-    
+        } 
+    } 
     public void checkFood() {
-
         for (int i = 0; i < foodList.size(); i++) {
             for (int j = 0; j < vision.length; j++) {
                 if (vision[j].getxCoordinate() == foodList.get(i).getxCoordinate() && vision[j].getyCoordinate() == foodList.get(i).getyCoordinate()) {
-                    vision[j].setFood();
-                   
+                    vision[j].setFood(); 
                 }
                     else
-                     vision[j].setNoFood();
-                }
+                    vision[j].setNoFood();
             }
-    }
-    public void createSnake() {
-        if (snakeBody.size() == 0) {
-            b = new BodyPart(xC, yC, blockSize);
-            snakeBody.add(b);
         }
     }
+    //--------------------SNAKE--------------------
+    public void createSnake() {
+        b = new BodyPart(xC, yC, blockSize);
+        snakeBody.add(b);
+
+        if (snakeBody.size() > snakeSize) {
+            snakeBody.remove(0);
+        }
+    }  
+    //--------------------FOOD--------------------
     public void createFood(){
         if (foodList.size() == 0) {
             int x = random.nextInt((WIDTH / blockSize) - 1);
             int y = random.nextInt((WIDTH / blockSize) - 1);
             food = new Food(x, y, blockSize);
             foodList.add(food);
-        }
-        
+        }   
     }
     public void checkFoodCollected(){
         for (int i = 0; i < foodList.size(); i++) {
@@ -205,6 +181,7 @@ public class Screen extends JPanel implements Runnable {
             }
         }
     }
+    //--------------------COLLISIONS--------------------
     public void checkBorderCollisions(){
         if (xC < 0 || xC > (WIDTH / blockSize) - 1 || yC < 0 || yC > (WIDTH / blockSize) - 1) {
             stop();
@@ -219,7 +196,9 @@ public class Screen extends JPanel implements Runnable {
             }
         }
     }
+    //--------------------DRAW--------------------
     public void paint(Graphics g) {
+        // Clear
         g.clearRect(0, 0, WIDTH, HEIGHT);
         // Fill background
         g.setColor(new Color(3421752));
@@ -230,11 +209,12 @@ public class Screen extends JPanel implements Runnable {
         for (int i = 0; i < snakeBody.size(); i++) {
             snakeBody.get(i).draw(g);
         }
-     
+        // Draw vision
+        if(enableVision){
         for(int i =0; i< vision.length;i++){
             vision[i].draw(g);
         }
-        
+        }
 
         // Draw food
         for (int i = 0; i < foodList.size(); i++) {
@@ -245,24 +225,28 @@ public class Screen extends JPanel implements Runnable {
         for (int i = 0; i < WIDTH / blockSize; i++) {
             g.drawLine(i * blockSize, 0, i * blockSize, HEIGHT);
         }
-
         // Draw y-axis grid 
         for (int i = 0; i < HEIGHT / blockSize; i++) {
             g.drawLine(0, i * blockSize, WIDTH, i * blockSize);
         }
-
     }
 
     //Runnable class abstract method
     @Override
     public void run() {
         while (running) {
-            tick();
+            loop();
             repaint();
         }
     }
 
-    //Snake steering
+    //--------------------STEERING--------------------
+      public void steering(){
+         if (right) xC++;
+         if (left)  xC--;
+         if (up)    yC--;
+         if (down)  yC++;
+    }
     private class movementHandler implements KeyListener {
 
         @Override
@@ -295,6 +279,9 @@ public class Screen extends JPanel implements Runnable {
                         up = false;
                         right = true;
                     }
+                    break;
+                case KeyEvent.VK_V:
+                    enableVision = !enableVision;
                     break;
             }
         }
