@@ -3,13 +3,14 @@ import java.awt.*;
 public class Vision {
     
     private int x, y, tileSize;
-    private boolean isInDanger, isFood;
+    private boolean isInDanger, isFood,isNearBody;
     public Vision(int x, int y, int tileSize){
         this.x = x;
         this.y = y;
         this.tileSize = tileSize;
         isInDanger = false;
         isFood = false;
+        isNearBody = false;
     }
     
     public void draw(Graphics g)
@@ -19,10 +20,18 @@ public class Vision {
         if(isInDanger)
         g2.setColor(Color.ORANGE);   
         if(isFood)
-        g2.setColor(new Color(9314446));
+        g2.setColor(new Color(9314446));      
+        if(isNearBody)
+        g2.setColor(Color.RED);
         g2.fillRect(x*tileSize, y*tileSize, tileSize, tileSize);
     }
     // SET/GET
+    public void setNearBody(){
+        this.isNearBody = true;
+    }
+    public void setNoBody(){
+        this.isNearBody = false;
+    }
     public boolean isFood(){
         return this.isFood;
     }

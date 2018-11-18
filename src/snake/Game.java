@@ -85,10 +85,11 @@ public class Game extends JPanel implements Runnable {
         if(enableVision){
         checkDanger();
         checkFood();
+        checkBody();
         }
         
         ticks++;
-        if (ticks > 500000) { //500000 zmienic na jakas stala wynikajaca z procesora/czasu systemu dla stalych FPS
+        if (ticks > 200000) { //500000 zmienic na jakas stala wynikajaca z procesora/czasu systemu dla stalych FPS
             steering();
             ticks = 0;
             createSnake();
@@ -143,6 +144,17 @@ public class Game extends JPanel implements Runnable {
             vision[i].setSafe();
         } 
     } 
+    public void checkBody(){
+        for (int i = 0; i < snakeBody.size(); i++) {
+            for(int j=0;j<vision.length;j++){
+                if(vision[j].getxCoordinate() == snakeBody.get(i).getxCoordinate() && 
+                   vision[j].getyCoordinate() == snakeBody.get(i).getyCoordinate())       
+                   vision[j].setNearBody();
+                else
+                   vision[j].setNoBody();
+            }  
+        }
+    }
     public void checkFood() {
         for (int i = 0; i < foodList.size(); i++) {
             for (int j = 0; j < vision.length; j++) {
