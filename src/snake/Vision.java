@@ -26,6 +26,7 @@ public class Vision {
         g2.fillRect(x*tileSize, y*tileSize, tileSize, tileSize);
     }
     // SET/GET
+   
     public void setNearBody(){
         this.isNearBody = true;
     }
