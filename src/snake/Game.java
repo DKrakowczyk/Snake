@@ -61,21 +61,6 @@ public class Game extends JPanel implements Runnable {
         start();
     }
 
-    public void start() {
-        running = true;
-        thread = new Thread(this, "Game");
-        thread.start();
-        
-    }
-    public void stop() {
-        running = false;
-        try {
-            thread.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public void loop() {
         createFood();
         checkFoodCollected();
@@ -213,10 +198,10 @@ public class Game extends JPanel implements Runnable {
         g.fillRect(0, 0, WIDTH, HEIGHT);
         // Draw vision
         if(drawVision){
-        for(int i =0; i< vision.length;i++){
-            if(vision[i]!=null)
-            vision[i].draw(g);
-        }
+            for(int i =0; i< vision.length;i++){
+                if(vision[i]!=null)
+                vision[i].draw(g);
+            }
         }
         // Draw snakeBody;
         g.setColor(new Color(16737792));
@@ -224,8 +209,6 @@ public class Game extends JPanel implements Runnable {
             if(snakeBody.get(i)!=null)
             snakeBody.get(i).draw(g);
         }
-
-
 
         // Draw food
         if(food!=null)
@@ -249,7 +232,32 @@ public class Game extends JPanel implements Runnable {
             repaint();
         }
     }
-
+    public void start() {
+        running = true;
+        thread = new Thread(this, "Game");
+        thread.start();
+        
+    }
+    public void stop() {
+        running = false;
+        try {
+            thread.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public void restart() {
+        xC = 0;
+        yC = 0;
+        snakeSize = 4;
+        snakeBody.removeAll(snakeBody);
+        right = true;
+        up = false;
+        food = null;
+        down = false;
+        left = false;
+        start();
+    }
     //--------------------STEERING--------------------
       public void steering(){
          if (right) xC++;
@@ -257,38 +265,50 @@ public class Game extends JPanel implements Runnable {
          if (up)    yC--;
          if (down)  yC++;
     }
+    public void goUp() {
+        if (!down) {
+            up = true;
+            right = false;
+            left = false;
+        }
+    }
+    public void goDown() {
+        if (!up) {
+            down = true;
+            left = false;
+            right = false;
+        }
+    }
+    public void goLeft() {
+        if (!right) {
+            down = false;
+            up = false;
+            left = true;
+        }
+    }
+    public void goRight() {
+        if (!left) {
+            down = false;
+            up = false;
+            right = true;
+        }
+    }
     private class movementHandler implements KeyListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_DOWN:
-                    if (!up) {
-                        down = true;
-                        left = false;
-                        right = false;
-                    }
+                    goDown();
                     break;
                 case KeyEvent.VK_UP:
-                    if (!down) {
-                        up = true;
-                        right = false;
-                        left = false;
-                    }
+                    goUp();
                     break;
                 case KeyEvent.VK_LEFT:
-                    if (!right) {
-                        down = false;
-                        up = false;
-                        left = true;
-                    }
+                    goLeft();
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if (!left) {
-                        down = false;
-                        up = false;
-                        right = true;
-                    }
+                    goRight();
                     break;
                 case KeyEvent.VK_V:
                     enableVision = !enableVision;
@@ -297,16 +317,7 @@ public class Game extends JPanel implements Runnable {
                     drawVision = !drawVision;
                     break;
                 case KeyEvent.VK_SPACE:
-                    xC = 0;
-                    yC = 0;
-                    snakeSize = 4;
-                    snakeBody.removeAll(snakeBody);
-                    right = true;
-                    up = false;
-                    food = null;
-                    down = false;
-                    left = false;
-                    start();
+                    restart();
                     break;
             }
         }
