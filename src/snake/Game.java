@@ -9,6 +9,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
@@ -34,11 +37,12 @@ public class Game extends JPanel implements Runnable {
     private BodyPart b;
     private ArrayList<BodyPart> snakeBody;
     private int snakeSize = 4;
-    private int xC, yC;
-
+    private int xC = 0, yC = 0;
+    private int countRuns = 1;
+    private int globalScore = 0;
     // Snake directions
     private boolean right = true, left = false, up = false, down = false;
-
+    public Frame frame;
     //Food
     private Food food;
     private Random random;
@@ -46,9 +50,12 @@ public class Game extends JPanel implements Runnable {
     private Vision[] vision;
     private boolean enableVision;
     private boolean drawVision;
-    
+    private boolean enableAI;
+    int score = 0;
+            boolean czyZjadl = false;
+
     public Game() {
-        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        setPreferredSize(new Dimension(1000, HEIGHT));
         setFocusable(true);
         key = new movementHandler();
         addKeyListener(key);
@@ -56,101 +63,505 @@ public class Game extends JPanel implements Runnable {
         food = null;
         random = new Random();
         createVision();
-        enableVision= false;
+        enableVision = false;
         drawVision = false;
-        start();
+        enableAI = false;
+
+    }
+
+    public void generateArray() {
+        int[][] gameBoard = new int[40][40];
+
+        for (int i = 0; i < snakeBody.size(); i++) {
+            for (int j = 0; j <= (WIDTH / blockSize) - 1; j++) {
+                for (int k = 0; k <= (HEIGHT / blockSize) - 1; k++) {
+                    if (j == snakeBody.get(i).getxCoordinate() && k == snakeBody.get(i).getyCoordinate()) {
+                        gameBoard[j][k] = 2;
+                    }
+                    if (j == xC && k == yC) {
+                        gameBoard[j][k] = 1;
+                    }
+                    if (j == food.getxCoordinate() && k == food.getyCoordinate()) {
+                        gameBoard[j][k] = 5;
+                    }
+                }
+            }
+        }
+
+//        for (int i = 0; i < gameBoard.length; i++) {
+//            for (int j = 0; j < gameBoard.length; j++) {
+//                System.out.print("[" + gameBoard[j][i] + "]");
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+    }
+
+    public boolean goForFood(int x,int y ){
+        if (y%2 ==0){
+            goRight();
+        } else {
+            goUp();
+            goRight();
+        }
+        return true;
+    }
+    public void ai() {
+        int x = food.getxCoordinate();
+        int y = food.getyCoordinate();
+        if (xC ==0 && czyZjadl){
+            goUp();
+            czyZjadl = false ;
+        }
+        if (xC == 39 && yC == 0) {
+            goDown();
+        }
+        if (xC == 39 && yC == 39) {
+            goLeft();
+        }
+        if (xC == 0 && yC == 39) {
+            goUp();
+        }
+
+        if ((yC == y || yC-1 == y )&& xC == 0) {
+            czyZjadl = goForFood(xC,yC);
+        }
+
+        if (xC == 38 && yC == 38) {
+            goUp();
+        }
+        if (xC == 38 && yC == 37) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 37) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 36) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 36) {
+            goUp();
+        }
+        if (xC == 38 && yC == 35) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 35) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 34) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 34) {
+            goUp();
+        }
+        if (xC == 38 && yC == 33) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 33) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 32) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 32) {
+            goUp();
+        }
+        if (xC == 38 && yC == 31) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 31) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 30) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 30) {
+            goUp();
+        }
+        if (xC == 38 && yC == 29) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 29) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 28) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 28) {
+            goUp();
+        }
+        if (xC == 38 && yC == 27) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 27) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 26) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 26) {
+            goUp();
+        }
+        if (xC == 38 && yC == 25) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 25) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 24) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 24) {
+            goUp();
+        }
+        if (xC == 38 && yC == 23) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 23) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 22) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 22) {
+            goUp();
+        }
+        if (xC == 38 && yC == 21) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 21) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 20) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 20) {
+            goUp();
+        }
+        if (xC == 38 && yC == 19) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 19) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 18) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 18) {
+            goUp();
+        }
+        if (xC == 38 && yC == 17) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 17) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 16) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 16) {
+            goUp();
+        }
+        if (xC == 38 && yC == 15) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 15) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 14) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 14) {
+            goUp();
+        }
+        if (xC == 38 && yC == 13) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 13) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 12) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 12) {
+            goUp();
+        }
+        if (xC == 38 && yC == 11) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 11) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 10) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 10) {
+            goUp();
+        }
+        if (xC == 38 && yC == 9) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 9) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 8) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 8) {
+            goUp();
+        }
+        if (xC == 38 && yC == 7) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 7) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 6) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 6) {
+            goUp();
+        }
+        if (xC == 38 && yC == 5) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 5) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 4) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 4) {
+            goUp();
+        }
+        if (xC == 38 && yC == 3) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 3) {
+//            goUp();
+//        }
+//        if (xC == 0 && yC == 2) {
+//            goRight();
+//        }
+        if (xC == 38 && yC == 2) {
+            goUp();
+        }
+        if (xC == 38 && yC == 1) {
+            goLeft();
+        }
+//        if (xC == 0 && yC == 1) {
+//            goUp();
+//        }
+
+        if (xC == 0 && yC == 0) {
+            goRight();
+        }
+
+//  
+//        int fx = 0;
+//        int fy = 0;
+//        if (food != null) {
+//            fx = food.getxCoordinate();
+//            fy = food.getyCoordinate();
+//        }
+//        if (right) {
+//            
+//            if (xC == fx && fy > yC) {
+//                goDown();
+//            }
+//               
+//            
+//            if (xC == fx && fy < yC) {
+//                goUp();
+//            }
+//            //Wykrywanie scian
+//            if (xC + 1 >= 40 && yC - 1 < 0) {
+//                goDown();
+//            }
+//            if (xC + 1 >= 40 && fy < yC) {
+//                goUp();
+//            }
+//            if (xC + 1 >= 40 && fy > yC) {
+//                goDown();
+//            }
+//            if (xC + 1 >= 40 && yC + 1 >= 40) {
+//                goUp();
+//            }
+//        
+//           
+//        }
+//        if (up) {
+//
+//            if (yC == fy && fx > xC) {
+//                goRight();
+//            }
+//            if (yC == fy && fx < xC) {
+//                goLeft();
+//            }
+//            //Wykrywanie scian
+//            if (xC - 1 < 0 && yC - 1 < 0) {
+//                goRight();
+//            } else if (yC - 1 < 0 && fx < xC) {
+//                goLeft();
+//            } else if (yC - 1 < 0 && fx > xC) {
+//                goRight();
+//            } else if (xC + 1 >= 40 && yC - 1 < 0) {
+//                goLeft();
+//            }
+//
+//        }
+//        if (down) {
+//
+//            if (yC == fy && fx > xC) {
+//                goRight();
+//            }
+//            if (yC == fy && fx < xC) {
+//                goLeft();
+//            }
+//
+//           
+//            //Wykrywanie scian
+//            if (yC + 1 >= 40 && xC - 1 < 0) {
+//                goRight();
+//            }
+//            if (yC + 1 >= 40 && fx < xC) {
+//                goLeft();
+//            }
+//            if (yC + 1 >= 40 && fx > xC) {
+//                goRight();
+//            }
+//            if (yC + 1 >= 40 && xC + 1 >= 40) {
+//                goLeft();
+//            }
+//           
+//
+//        }
+//        if (left) {
+//
+//            if (xC == fx && fy > yC) {
+//                goDown();
+//            }
+//            if (xC == fx && fy < yC) {
+//                goUp();
+//            }
+//
+//            //Wykrywanie scian
+//            if (xC - 1 < 0 && yC - 1 < 0) {
+//                goDown();
+//            }
+//            if (xC - 1 < 0 && fy < yC) {
+//                goUp();
+//            }
+//            if (xC - 1 < 0 && fy > yC) {
+//                goDown();
+//            }
+//            if (xC - 1 < 0 && yC + 1 >= 40) {
+//                goUp();
+//            }
+//         
+//
+//        }
     }
 
     public void loop() {
         createFood();
         checkFoodCollected();
-        
+
         ticks++;
-        if (ticks >300000) { 
-       
-        checkBodyCollisions();
-        checkBorderCollisions();
-        
-        if(enableVision){
-        checkDanger();
-        checkFood();
-        checkBody();
-        }//500000 zmienic na jakas stala wynikajaca z procesora/czasu systemu dla stalych FPS
+        if (ticks > 200000) {
+            if (enableAI) {
+                ai();
+            }
+            checkBodyCollisions();
+            checkBorderCollisions();
+
+            if (enableVision) {
+
+                checkDanger();
+                checkFood();
+                checkBody();
+            }//500000 zmienic na jakas stala wynikajaca z procesora/czasu systemu dla stalych FPS
             steering();
             ticks = 0;
             createSnake();
             createVision();
         }
     }
-  
-    
+
     //--------------------VISION--------------------
-    public void createVision(){
+    public void createVision() {
         vision = new Vision[6];
-            if (right) {
-            vision[0] = new Vision(xC,yC+1,blockSize);
-            vision[1] = new Vision(xC,yC+2,blockSize);
-            vision[2] = new Vision(xC+1,yC,blockSize);
-            vision[3] = new Vision(xC+2,yC,blockSize);
-            vision[4] = new Vision(xC,yC-1,blockSize);
-            vision[5] = new Vision(xC,yC-2,blockSize);
-            }
-            if (left) {
-            vision[0] = new Vision(xC,yC-1,blockSize);
-            vision[1] = new Vision(xC,yC-2,blockSize);
-            vision[2] = new Vision(xC-1,yC,blockSize);
-            vision[3] = new Vision(xC-2,yC,blockSize);
-            vision[4] = new Vision(xC,yC+1,blockSize);
-            vision[5] = new Vision(xC,yC+2,blockSize);
-            }
-            if (up) {
-            vision[0] = new Vision(xC-1,yC,blockSize);
-            vision[1] = new Vision(xC-2,yC,blockSize);
-            vision[2] = new Vision(xC,yC-1,blockSize);
-            vision[3] = new Vision(xC,yC-2,blockSize);
-            vision[4] = new Vision(xC+1,yC,blockSize);
-            vision[5] = new Vision(xC+2,yC,blockSize);
-            }
-            if (down) {
-            vision[0] = new Vision(xC+1,yC,blockSize);
-            vision[1] = new Vision(xC+2,yC,blockSize);
-            vision[2] = new Vision(xC,yC+1,blockSize);
-            vision[3] = new Vision(xC,yC+2,blockSize);
-            vision[4] = new Vision(xC-1,yC,blockSize);
-            vision[5] = new Vision(xC-2,yC,blockSize);
-            }
-        
-    }
-    public void checkDanger(){
-        for(int i=0;i<vision.length;i++){
-        if(vision[i].getxCoordinate() < 0 || vision[i].getxCoordinate() > (WIDTH / blockSize) - 1 ||
-           vision[i].getyCoordinate() < 0 || vision[i].getyCoordinate() > (WIDTH / blockSize) - 1) {     
-            for(int j =0; j<snakeBody.size();j++)
-            snakeBody.get(j).setNearWall();
-        } 
+        if (right) {
+            vision[0] = new Vision(xC, yC + 1, blockSize);
+            vision[1] = new Vision(xC, yC + 2, blockSize);
+            vision[2] = new Vision(xC + 1, yC, blockSize);
+            vision[3] = new Vision(xC + 2, yC, blockSize);
+            vision[4] = new Vision(xC, yC - 1, blockSize);
+            vision[5] = new Vision(xC, yC - 2, blockSize);
         }
-    } 
-    public void checkBody(){
-        for (int i = 0; i < snakeBody.size(); i++) {
-            for(int j=0;j<vision.length;j++){
-                if(vision[j].getxCoordinate() == snakeBody.get(i).getxCoordinate() && 
-                   vision[j].getyCoordinate() == snakeBody.get(i).getyCoordinate()){       
-                   for(int k =0; k<snakeBody.size();k++)
-                   snakeBody.get(k).setNearBody();  
+        if (left) {
+            vision[0] = new Vision(xC, yC - 1, blockSize);
+            vision[1] = new Vision(xC, yC - 2, blockSize);
+            vision[2] = new Vision(xC - 1, yC, blockSize);
+            vision[3] = new Vision(xC - 2, yC, blockSize);
+            vision[4] = new Vision(xC, yC + 1, blockSize);
+            vision[5] = new Vision(xC, yC + 2, blockSize);
+        }
+        if (up) {
+            vision[0] = new Vision(xC - 1, yC, blockSize);
+            vision[1] = new Vision(xC - 2, yC, blockSize);
+            vision[2] = new Vision(xC, yC - 1, blockSize);
+            vision[3] = new Vision(xC, yC - 2, blockSize);
+            vision[4] = new Vision(xC + 1, yC, blockSize);
+            vision[5] = new Vision(xC + 2, yC, blockSize);
+        }
+        if (down) {
+            vision[0] = new Vision(xC + 1, yC, blockSize);
+            vision[1] = new Vision(xC + 2, yC, blockSize);
+            vision[2] = new Vision(xC, yC + 1, blockSize);
+            vision[3] = new Vision(xC, yC + 2, blockSize);
+            vision[4] = new Vision(xC - 1, yC, blockSize);
+            vision[5] = new Vision(xC - 2, yC, blockSize);
+        }
+
+    }
+
+    public void checkDanger() {
+        for (int i = 0; i < vision.length; i++) {
+            if (vision[i].getxCoordinate() < 0 || vision[i].getxCoordinate() > (WIDTH / blockSize) - 1
+                    || vision[i].getyCoordinate() < 0 || vision[i].getyCoordinate() > (WIDTH / blockSize) - 1) {
+                for (int j = 0; j < snakeBody.size(); j++) {
+                    snakeBody.get(j).setNearWall();
                 }
-            }  
+            }
         }
     }
+
+    public void checkBody() {
+        for (int i = 0; i < snakeBody.size(); i++) {
+            for (int j = 0; j < vision.length; j++) {
+                if (vision[j].getxCoordinate() == snakeBody.get(i).getxCoordinate()
+                        && vision[j].getyCoordinate() == snakeBody.get(i).getyCoordinate()) {
+                    for (int k = 0; k < snakeBody.size(); k++) {
+                        snakeBody.get(k).setNearBody();
+                    }
+                }
+            }
+        }
+    }
+
     public void checkFood() {
         for (int i = 0; i < vision.length; i++) {
-            if(food!=null){
-            if (vision[i].getxCoordinate() == food.getxCoordinate() && vision[i].getyCoordinate() == food.getyCoordinate()) {
-            for(int j =0; j<snakeBody.size();j++)
-            snakeBody.get(j).setNearFood();    
-            }
+            if (food != null) {
+                if (vision[i].getxCoordinate() == food.getxCoordinate() && vision[i].getyCoordinate() == food.getyCoordinate()) {
+                    for (int j = 0; j < snakeBody.size(); j++) {
+                        snakeBody.get(j).setNearFood();
+                    }
+                }
             }
         }
     }
+
     //--------------------SNAKE--------------------
     public void createSnake() {
         b = new BodyPart(xC, yC, blockSize);
@@ -159,28 +570,50 @@ public class Game extends JPanel implements Runnable {
         if (snakeBody.size() > snakeSize) {
             snakeBody.remove(0);
         }
-    }  
-    //--------------------FOOD--------------------
-    public void createFood(){
-        if(food == null){
-            int x = random.nextInt((WIDTH / blockSize) - 1);
-            int y = random.nextInt((WIDTH / blockSize) - 1);
-            food = new Food(x, y, blockSize);
-        }  
     }
-    public void checkFoodCollected(){
-        if(xC == food.getxCoordinate() && yC== food.getyCoordinate()){
-            snakeSize++;
-            food = null;         
+
+    //--------------------FOOD--------------------
+    public void createFood() {
+        int x = 0, y = 0;
+        if (food == null) {
+            boolean isUnique = false;
+            while (!isUnique) {
+                isUnique = true;
+                x = random.nextInt((WIDTH / blockSize) - 1);
+                y = random.nextInt((WIDTH / blockSize) - 1);
+
+                if (x == xC || y == yC) {
+                    isUnique = false;
+                }
+
+                for (BodyPart part : snakeBody) {
+                    if (part.getxCoordinate() == x && part.getyCoordinate() == y) {
+                        isUnique = false;
+                    }
+                }
+            }
+
+            food = new Food(x, y, blockSize);
         }
     }
+
+    public void checkFoodCollected() {
+        if (xC == food.getxCoordinate() && yC == food.getyCoordinate()) {
+            snakeSize++;
+            score++;
+            globalScore++;
+            food = null;
+        }
+    }
+
     //--------------------COLLISIONS--------------------
-    public void checkBorderCollisions(){
+    public void checkBorderCollisions() {
         if (xC < 0 || xC > (WIDTH / blockSize) - 1 || yC < 0 || yC > (WIDTH / blockSize) - 1) {
             stop();
         }
     }
-    public void checkBodyCollisions(){
+
+    public void checkBodyCollisions() {
         for (int i = 0; i < snakeBody.size(); i++) {
             if (xC == snakeBody.get(i).getxCoordinate() && yC == snakeBody.get(i).getyCoordinate()) {
                 if (i != snakeBody.size() - 1) {
@@ -190,29 +623,76 @@ public class Game extends JPanel implements Runnable {
         }
     }
     //--------------------DRAW--------------------
+
     public void paint(Graphics g) {
         // Clear
         g.clearRect(0, 0, WIDTH, HEIGHT);
         // Fill background
         g.setColor(new Color(3421752));
         g.fillRect(0, 0, WIDTH, HEIGHT);
+
+        //Info bar
+        g.setColor(new Color(1381910));
+        g.fillRect(WIDTH, 0, 1000, 50);
+        g.setColor(new Color(2698029));
+        g.fillRect(WIDTH, 50, 1000, HEIGHT);
+        g.setColor(Color.white);
+        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.drawString("snakeAI", 870, 30);
+        g.drawString("--------------------------", 810, 70);
+        if (score > 80) {
+            g.setColor(new Color(2781744));
+        }
+        g.drawString("Score:", 810, 100);
+        g.drawString(Integer.toString(score), 920, 100);
+        g.setColor(Color.white);
+        g.drawString("Score(avg):", 810, 135);
+        g.drawString(Float.toString(globalScore / countRuns), 920, 135);
+        g.drawString("--------------------------", 810, 170);
+
+        g.drawString("Shortcuts:", 810, 235);
+        g.drawString("--------------------------", 810, 250);
+        g.setFont(new Font("Arial", Font.PLAIN, 15));
+        if (enableAI) {
+            g.setColor(new Color(2781744));
+        }
+        g.drawString("A - enable AI", 810, 280);
+        g.setColor(Color.white);
+        if (enableVision) {
+            g.setColor(new Color(2781744));
+        }
+        g.drawString("V - enable color view", 810, 305);
+        g.setColor(Color.white);
+        if (drawVision) {
+            g.setColor(new Color(2781744));
+        }
+        g.drawString("S - enable view array", 810, 330);
+        g.setColor(Color.white);
+        g.drawString("P - start game", 810, 355);
+        g.drawString("Space - restart", 810, 380);
+        g.drawString("Arrows - steering", 810, 405);
         // Draw vision
-        if(drawVision){
-            for(int i =0; i< vision.length;i++){
-                if(vision[i]!=null)
-                vision[i].draw(g);
+
+        if (drawVision) {
+            for (int i = 0; i < vision.length; i++) {
+                if (vision[i] != null) {
+                    vision[i].draw(g);
+                }
             }
         }
         // Draw snakeBody;
         g.setColor(new Color(16737792));
         for (int i = 0; i < snakeBody.size(); i++) {
-            if(snakeBody.get(i)!=null)
-            snakeBody.get(i).draw(g);
+            if (snakeBody.get(i) != null) {
+
+                snakeBody.get(i).draw(g);
+            }
         }
 
         // Draw food
-        if(food!=null)
-        food.draw(g);
+        if (food != null) {
+            food.draw(g);
+        }
         // Draw x-axis grid 
         g.setColor(new Color(1052945));
         for (int i = 0; i < WIDTH / blockSize; i++) {
@@ -221,6 +701,11 @@ public class Game extends JPanel implements Runnable {
         // Draw y-axis grid 
         for (int i = 0; i < HEIGHT / blockSize; i++) {
             g.drawLine(0, i * blockSize, WIDTH, i * blockSize);
+        }
+        if (!running) {
+            g.setColor(Color.white);
+            g.setFont(new Font("Arial", Font.PLAIN, 160));
+            g.drawString("S N A K E", 40, 390);
         }
     }
 
@@ -232,24 +717,30 @@ public class Game extends JPanel implements Runnable {
             repaint();
         }
     }
+
     public void start() {
         running = true;
         thread = new Thread(this, "Game");
         thread.start();
-        
+
     }
+
     public void stop() {
         running = false;
+        System.out.println(score);
         try {
             thread.join();
         } catch (InterruptedException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     public void restart() {
         xC = 0;
         yC = 0;
         snakeSize = 4;
+        score = 0;
+        countRuns++;
         snakeBody.removeAll(snakeBody);
         right = true;
         up = false;
@@ -258,13 +749,23 @@ public class Game extends JPanel implements Runnable {
         left = false;
         start();
     }
+
     //--------------------STEERING--------------------
-      public void steering(){
-         if (right) xC++;
-         if (left)  xC--;
-         if (up)    yC--;
-         if (down)  yC++;
+    public void steering() {
+        if (right) {
+            xC++;
+        }
+        if (left) {
+            xC--;
+        }
+        if (up) {
+            yC--;
+        }
+        if (down) {
+            yC++;
+        }
     }
+
     public void goUp() {
         if (!down) {
             up = true;
@@ -272,6 +773,7 @@ public class Game extends JPanel implements Runnable {
             left = false;
         }
     }
+
     public void goDown() {
         if (!up) {
             down = true;
@@ -279,6 +781,7 @@ public class Game extends JPanel implements Runnable {
             right = false;
         }
     }
+
     public void goLeft() {
         if (!right) {
             down = false;
@@ -286,6 +789,7 @@ public class Game extends JPanel implements Runnable {
             left = true;
         }
     }
+
     public void goRight() {
         if (!left) {
             down = false;
@@ -293,6 +797,7 @@ public class Game extends JPanel implements Runnable {
             right = true;
         }
     }
+
     private class movementHandler implements KeyListener {
 
         @Override
@@ -315,6 +820,12 @@ public class Game extends JPanel implements Runnable {
                     break;
                 case KeyEvent.VK_S:
                     drawVision = !drawVision;
+                    break;
+                case KeyEvent.VK_A:
+                    enableAI = !enableAI;
+                    break;
+                case KeyEvent.VK_P:
+                    start();
                     break;
                 case KeyEvent.VK_SPACE:
                     restart();

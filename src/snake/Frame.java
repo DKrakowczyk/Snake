@@ -7,6 +7,8 @@ package snake;
 
 import java.awt.GridLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import static snake.Game.WIDTH;
 
 /**
  *
@@ -32,4 +34,5 @@ public class Frame extends JFrame{
     public static void main(String[] args){
         new Frame();
     }
+    
 }
