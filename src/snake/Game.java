@@ -23,7 +23,7 @@ public class Game extends JPanel implements Runnable {
     private Thread thread;
     private boolean running;
     private int ticks;
-    
+    private int gameSpeed;
     //Keyboard input
     private movementHandler key;
 
@@ -42,7 +42,9 @@ public class Game extends JPanel implements Runnable {
     private Vision[] vision;
     private boolean enableVision;
     private boolean drawVision;
-    private boolean enableAI;
+    private boolean enableHamiltonWithShortcuts;
+    private boolean enableHamilton;
+    private boolean simplePathfinder;
     
     protected boolean hasEaten = false;
     
@@ -50,6 +52,7 @@ public class Game extends JPanel implements Runnable {
     int score;
     private int countRuns;
     private int globalScore;
+    
 
     public Game() {
         setPreferredSize(new Dimension(1000, HEIGHT));
@@ -60,15 +63,17 @@ public class Game extends JPanel implements Runnable {
         food = null;
         random = new Random();
         running = false;
+        gameSpeed = 200000;
         ticks = 0;
         snakeSize = 4;
         score = 0;
         countRuns = 1;
         globalScore = 0;
-        createVision();
         enableVision = false;
         drawVision = false;
-        enableAI = false;
+        enableHamiltonWithShortcuts = false;
+        enableHamilton = false;
+        simplePathfinder = false;
     }
 
     public void loop() {
@@ -76,19 +81,24 @@ public class Game extends JPanel implements Runnable {
         checkFoodCollected();
 
         ticks++;
-        if (ticks > 2000) {
-            if (enableAI) {
+        if (ticks > gameSpeed) {
+            if (enableHamiltonWithShortcuts && !simplePathfinder && !enableHamilton) {
                 AI.HamiltonCycleShortcuts(this);
             }
+            if (!enableHamiltonWithShortcuts && !simplePathfinder && enableHamilton) {
+                AI.HamiltonCycle(this);
+            }
+            if (!enableHamiltonWithShortcuts && simplePathfinder && !enableHamilton) {
+                AI.simpleFoodFinding(this);
+            }
+             System.out.println(gameSpeed);
             checkBodyCollisions();
             checkBorderCollisions();
-
             if (enableVision) {
-
                 checkDanger();
                 checkFood();
                 checkBody();
-            }//500000 zmienic na jakas stala wynikajaca z procesora/czasu systemu dla stalych FPS
+            }
             steering();
             ticks = 0;
             createSnake();
@@ -249,29 +259,47 @@ public class Game extends JPanel implements Runnable {
         g.setColor(Color.white);
         g.drawString("Score(avg):", 810, 135);
         g.drawString(Float.toString(globalScore / countRuns), 920, 135);
-        g.drawString("--------------------------", 810, 170);
+        g.drawString("Runs:", 810, 170);
+        g.drawString(Integer.toString(countRuns), 920, 170);
+        g.drawString("--------------------------", 810, 190);
 
-        g.drawString("Shortcuts:", 810, 235);
+        g.drawString("Shortcuts", 810, 235);
         g.drawString("--------------------------", 810, 250);
         g.setFont(new Font("Arial", Font.PLAIN, 15));
-        if (enableAI) {
-            g.setColor(new Color(2781744));
-        }
-        g.drawString("A - enable AI", 810, 280);
-        g.setColor(Color.white);
         if (enableVision) {
             g.setColor(new Color(2781744));
         }
-        g.drawString("V - enable color view", 810, 305);
+        g.drawString("C - enable color view", 810, 275);
         g.setColor(Color.white);
         if (drawVision) {
             g.setColor(new Color(2781744));
         }
-        g.drawString("S - enable view array", 810, 330);
+        g.drawString("V - enable view array", 810, 300);
         g.setColor(Color.white);
-        g.drawString("P - start game", 810, 355);
-        g.drawString("Space - restart", 810, 380);
-        g.drawString("Arrows - steering", 810, 405);
+        g.drawString("P - start game", 810, 325);
+        g.drawString("Space - restart", 810, 350);
+        g.drawString("Arrows - steering", 810, 375);
+        g.drawString("Game speed - F/S", 810, 400);
+        
+        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.drawString("AI", 810, 460);
+        g.drawString("--------------------------", 810, 475);
+        g.setFont(new Font("Arial", Font.PLAIN, 15));
+        if (enableHamilton) {
+            g.setColor(new Color(2781744));
+        }
+        g.drawString("1 - Hamilton", 810, 500);
+        g.setColor(Color.white);
+        if (enableHamiltonWithShortcuts) {
+            g.setColor(new Color(2781744));
+        }
+        g.drawString("2 - Hamilton /w shortcuts", 810, 525);
+        g.setColor(Color.white);
+        if (simplePathfinder) {
+            g.setColor(new Color(2781744));
+        }
+        g.drawString("3 - Simple pathfinder", 810, 550);
+        g.setColor(Color.white);
         
         //-------------DRAW-VISION-------------
         if (drawVision) {
@@ -283,7 +311,7 @@ public class Game extends JPanel implements Runnable {
         }
         //-------------DRAW-SNAKEBODY-------------
         g.setColor(new Color(16737792));
-        for (int i = 0; i < snakeBody.size()-1; i++) {
+        for (int i = 0; i < snakeBody.size(); i++) {
             if (snakeBody.get(i) != null) {
                 snakeBody.get(i).draw(g);
             }
@@ -302,10 +330,10 @@ public class Game extends JPanel implements Runnable {
             g.drawLine(0, i * blockSize, WIDTH, i * blockSize);
         }
         //-------------LOGO-------------
-        if (!running) {
+        if (!running || score==1597) {
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.PLAIN, 160));
-            g.drawString("S N A K E", 40, 390);
+            g.drawString("S N A K E", 40, 400);
         }
     }
 
@@ -407,14 +435,26 @@ public class Game extends JPanel implements Runnable {
                 case KeyEvent.VK_RIGHT:
                     goRight();
                     break;
-                case KeyEvent.VK_V:
+                case KeyEvent.VK_C:
                     enableVision = !enableVision;
                     break;
-                case KeyEvent.VK_S:
+                case KeyEvent.VK_V:
                     drawVision = !drawVision;
                     break;
-                case KeyEvent.VK_A:
-                    enableAI = !enableAI;
+                case KeyEvent.VK_1:
+                    enableHamiltonWithShortcuts = false;
+                    simplePathfinder = false;
+                    enableHamilton = !enableHamilton;
+                    break;
+                case KeyEvent.VK_2:
+                    enableHamilton = false;
+                    simplePathfinder = false;
+                    enableHamiltonWithShortcuts = !enableHamiltonWithShortcuts;
+                    break;
+                case KeyEvent.VK_3:
+                    enableHamilton = false;
+                    enableHamiltonWithShortcuts = false;
+                    simplePathfinder = !simplePathfinder;
                     break;
                 case KeyEvent.VK_P:
                     start();
@@ -422,6 +462,20 @@ public class Game extends JPanel implements Runnable {
                 case KeyEvent.VK_SPACE:
                     restart();
                     break;
+                case KeyEvent.VK_F:
+                    if(gameSpeed > 10000)
+                    gameSpeed -=10000;
+                    else if(gameSpeed <= 10000 && gameSpeed > 200)
+                    {
+                        gameSpeed -=200;
+                    }
+                    break;
+                case KeyEvent.VK_S:
+                    if(gameSpeed <500000)
+                    gameSpeed +=10000;
+                    break;
+                 
+                    
             }
         }
 
