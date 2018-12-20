@@ -1,19 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package snake;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -24,35 +15,41 @@ import javax.swing.*;
  */
 public class Game extends JPanel implements Runnable {
 
-    //
+    // Variables for main game board
+    public Frame frame;
     public static final int WIDTH = 800, HEIGHT = 800, blockSize = 20;
+    
+    // Game state
     private Thread thread;
-    private int ticks = 0;
+    private boolean running;
+    private int ticks;
+    
+    //Keyboard input
     private movementHandler key;
 
-    // Game state
-    private boolean running = false;
-
-    // Variables that are defying snake
-    private BodyPart b;
+    //Snake
     private ArrayList<BodyPart> snakeBody;
-    private int snakeSize = 4;
-    private int xC = 0, yC = 0;
-    private int countRuns = 1;
-    private int globalScore = 0;
-    // Snake directions
-    private boolean right = true, left = false, up = false, down = false;
-    public Frame frame;
+    private BodyPart b;
+    protected int snakeSize;
+    protected int xC, yC; //Snake head position
+    protected boolean right = true, left = false, up = false, down = false;  //Snake directions
+    
     //Food
-    private Food food;
+    protected Food food;
     private Random random;
-    // Vision
+    
+    // Booleans for different options
     private Vision[] vision;
     private boolean enableVision;
     private boolean drawVision;
     private boolean enableAI;
-    int score = 0;
-            boolean czyZjadl = false;
+    
+    protected boolean hasEaten = false;
+    
+    //Score variables
+    int score;
+    private int countRuns;
+    private int globalScore;
 
     public Game() {
         setPreferredSize(new Dimension(1000, HEIGHT));
@@ -62,405 +59,16 @@ public class Game extends JPanel implements Runnable {
         snakeBody = new ArrayList<>();
         food = null;
         random = new Random();
+        running = false;
+        ticks = 0;
+        snakeSize = 4;
+        score = 0;
+        countRuns = 1;
+        globalScore = 0;
         createVision();
         enableVision = false;
         drawVision = false;
         enableAI = false;
-
-    }
-
-    public void generateArray() {
-        int[][] gameBoard = new int[40][40];
-
-        for (int i = 0; i < snakeBody.size(); i++) {
-            for (int j = 0; j <= (WIDTH / blockSize) - 1; j++) {
-                for (int k = 0; k <= (HEIGHT / blockSize) - 1; k++) {
-                    if (j == snakeBody.get(i).getxCoordinate() && k == snakeBody.get(i).getyCoordinate()) {
-                        gameBoard[j][k] = 2;
-                    }
-                    if (j == xC && k == yC) {
-                        gameBoard[j][k] = 1;
-                    }
-                    if (j == food.getxCoordinate() && k == food.getyCoordinate()) {
-                        gameBoard[j][k] = 5;
-                    }
-                }
-            }
-        }
-
-//        for (int i = 0; i < gameBoard.length; i++) {
-//            for (int j = 0; j < gameBoard.length; j++) {
-//                System.out.print("[" + gameBoard[j][i] + "]");
-//            }
-//            System.out.println();
-//        }
-//        System.out.println();
-    }
-
-    public boolean goForFood(int x,int y ){
-        if (y%2 ==0){
-            goRight();
-        } else {
-            goUp();
-            goRight();
-        }
-        return true;
-    }
-    public void ai() {
-        int x = food.getxCoordinate();
-        int y = food.getyCoordinate();
-        if (xC ==0 && czyZjadl){
-            goUp();
-            czyZjadl = false ;
-        }
-        if (xC == 39 && yC == 0) {
-            goDown();
-        }
-        if (xC == 39 && yC == 39) {
-            goLeft();
-        }
-        if (xC == 0 && yC == 39) {
-            goUp();
-        }
-
-        if ((yC == y || yC-1 == y )&& xC == 0) {
-            czyZjadl = goForFood(xC,yC);
-        }
-
-        if (xC == 38 && yC == 38) {
-            goUp();
-        }
-        if (xC == 38 && yC == 37) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 37) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 36) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 36) {
-            goUp();
-        }
-        if (xC == 38 && yC == 35) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 35) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 34) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 34) {
-            goUp();
-        }
-        if (xC == 38 && yC == 33) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 33) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 32) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 32) {
-            goUp();
-        }
-        if (xC == 38 && yC == 31) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 31) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 30) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 30) {
-            goUp();
-        }
-        if (xC == 38 && yC == 29) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 29) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 28) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 28) {
-            goUp();
-        }
-        if (xC == 38 && yC == 27) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 27) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 26) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 26) {
-            goUp();
-        }
-        if (xC == 38 && yC == 25) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 25) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 24) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 24) {
-            goUp();
-        }
-        if (xC == 38 && yC == 23) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 23) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 22) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 22) {
-            goUp();
-        }
-        if (xC == 38 && yC == 21) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 21) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 20) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 20) {
-            goUp();
-        }
-        if (xC == 38 && yC == 19) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 19) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 18) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 18) {
-            goUp();
-        }
-        if (xC == 38 && yC == 17) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 17) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 16) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 16) {
-            goUp();
-        }
-        if (xC == 38 && yC == 15) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 15) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 14) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 14) {
-            goUp();
-        }
-        if (xC == 38 && yC == 13) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 13) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 12) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 12) {
-            goUp();
-        }
-        if (xC == 38 && yC == 11) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 11) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 10) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 10) {
-            goUp();
-        }
-        if (xC == 38 && yC == 9) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 9) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 8) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 8) {
-            goUp();
-        }
-        if (xC == 38 && yC == 7) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 7) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 6) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 6) {
-            goUp();
-        }
-        if (xC == 38 && yC == 5) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 5) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 4) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 4) {
-            goUp();
-        }
-        if (xC == 38 && yC == 3) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 3) {
-//            goUp();
-//        }
-//        if (xC == 0 && yC == 2) {
-//            goRight();
-//        }
-        if (xC == 38 && yC == 2) {
-            goUp();
-        }
-        if (xC == 38 && yC == 1) {
-            goLeft();
-        }
-//        if (xC == 0 && yC == 1) {
-//            goUp();
-//        }
-
-        if (xC == 0 && yC == 0) {
-            goRight();
-        }
-
-//  
-//        int fx = 0;
-//        int fy = 0;
-//        if (food != null) {
-//            fx = food.getxCoordinate();
-//            fy = food.getyCoordinate();
-//        }
-//        if (right) {
-//            
-//            if (xC == fx && fy > yC) {
-//                goDown();
-//            }
-//               
-//            
-//            if (xC == fx && fy < yC) {
-//                goUp();
-//            }
-//            //Wykrywanie scian
-//            if (xC + 1 >= 40 && yC - 1 < 0) {
-//                goDown();
-//            }
-//            if (xC + 1 >= 40 && fy < yC) {
-//                goUp();
-//            }
-//            if (xC + 1 >= 40 && fy > yC) {
-//                goDown();
-//            }
-//            if (xC + 1 >= 40 && yC + 1 >= 40) {
-//                goUp();
-//            }
-//        
-//           
-//        }
-//        if (up) {
-//
-//            if (yC == fy && fx > xC) {
-//                goRight();
-//            }
-//            if (yC == fy && fx < xC) {
-//                goLeft();
-//            }
-//            //Wykrywanie scian
-//            if (xC - 1 < 0 && yC - 1 < 0) {
-//                goRight();
-//            } else if (yC - 1 < 0 && fx < xC) {
-//                goLeft();
-//            } else if (yC - 1 < 0 && fx > xC) {
-//                goRight();
-//            } else if (xC + 1 >= 40 && yC - 1 < 0) {
-//                goLeft();
-//            }
-//
-//        }
-//        if (down) {
-//
-//            if (yC == fy && fx > xC) {
-//                goRight();
-//            }
-//            if (yC == fy && fx < xC) {
-//                goLeft();
-//            }
-//
-//           
-//            //Wykrywanie scian
-//            if (yC + 1 >= 40 && xC - 1 < 0) {
-//                goRight();
-//            }
-//            if (yC + 1 >= 40 && fx < xC) {
-//                goLeft();
-//            }
-//            if (yC + 1 >= 40 && fx > xC) {
-//                goRight();
-//            }
-//            if (yC + 1 >= 40 && xC + 1 >= 40) {
-//                goLeft();
-//            }
-//           
-//
-//        }
-//        if (left) {
-//
-//            if (xC == fx && fy > yC) {
-//                goDown();
-//            }
-//            if (xC == fx && fy < yC) {
-//                goUp();
-//            }
-//
-//            //Wykrywanie scian
-//            if (xC - 1 < 0 && yC - 1 < 0) {
-//                goDown();
-//            }
-//            if (xC - 1 < 0 && fy < yC) {
-//                goUp();
-//            }
-//            if (xC - 1 < 0 && fy > yC) {
-//                goDown();
-//            }
-//            if (xC - 1 < 0 && yC + 1 >= 40) {
-//                goUp();
-//            }
-//         
-//
-//        }
     }
 
     public void loop() {
@@ -468,9 +76,9 @@ public class Game extends JPanel implements Runnable {
         checkFoodCollected();
 
         ticks++;
-        if (ticks > 200000) {
+        if (ticks > 2000) {
             if (enableAI) {
-                ai();
+                AI.HamiltonCycleShortcuts(this);
             }
             checkBodyCollisions();
             checkBorderCollisions();
@@ -488,7 +96,7 @@ public class Game extends JPanel implements Runnable {
         }
     }
 
-    //--------------------VISION--------------------
+    //------------------------------------------VISION------------------------------------------
     public void createVision() {
         vision = new Vision[6];
         if (right) {
@@ -562,7 +170,7 @@ public class Game extends JPanel implements Runnable {
         }
     }
 
-    //--------------------SNAKE--------------------
+    //------------------------------------------SNAKE------------------------------------------
     public void createSnake() {
         b = new BodyPart(xC, yC, blockSize);
         snakeBody.add(b);
@@ -572,27 +180,21 @@ public class Game extends JPanel implements Runnable {
         }
     }
 
-    //--------------------FOOD--------------------
+    //------------------------------------------FOOD------------------------------------------
     public void createFood() {
         int x = 0, y = 0;
         if (food == null) {
             boolean isUnique = false;
             while (!isUnique) {
                 isUnique = true;
-                x = random.nextInt((WIDTH / blockSize) - 1);
-                y = random.nextInt((WIDTH / blockSize) - 1);
-
-                if (x == xC || y == yC) {
-                    isUnique = false;
-                }
-
+                x = random.nextInt((WIDTH / blockSize));
+                y = random.nextInt((WIDTH / blockSize));
                 for (BodyPart part : snakeBody) {
                     if (part.getxCoordinate() == x && part.getyCoordinate() == y) {
                         isUnique = false;
                     }
                 }
             }
-
             food = new Food(x, y, blockSize);
         }
     }
@@ -606,7 +208,7 @@ public class Game extends JPanel implements Runnable {
         }
     }
 
-    //--------------------COLLISIONS--------------------
+    //------------------------------------------COLLISIONS------------------------------------------
     public void checkBorderCollisions() {
         if (xC < 0 || xC > (WIDTH / blockSize) - 1 || yC < 0 || yC > (WIDTH / blockSize) - 1) {
             stop();
@@ -622,7 +224,7 @@ public class Game extends JPanel implements Runnable {
             }
         }
     }
-    //--------------------DRAW--------------------
+    //------------------------------------------DRAW------------------------------------------
 
     public void paint(Graphics g) {
         // Clear
@@ -630,8 +232,7 @@ public class Game extends JPanel implements Runnable {
         // Fill background
         g.setColor(new Color(3421752));
         g.fillRect(0, 0, WIDTH, HEIGHT);
-
-        //Info bar
+        //-------------INFO-BAR-------------
         g.setColor(new Color(1381910));
         g.fillRect(WIDTH, 0, 1000, 50);
         g.setColor(new Color(2698029));
@@ -671,8 +272,8 @@ public class Game extends JPanel implements Runnable {
         g.drawString("P - start game", 810, 355);
         g.drawString("Space - restart", 810, 380);
         g.drawString("Arrows - steering", 810, 405);
-        // Draw vision
-
+        
+        //-------------DRAW-VISION-------------
         if (drawVision) {
             for (int i = 0; i < vision.length; i++) {
                 if (vision[i] != null) {
@@ -680,28 +281,27 @@ public class Game extends JPanel implements Runnable {
                 }
             }
         }
-        // Draw snakeBody;
+        //-------------DRAW-SNAKEBODY-------------
         g.setColor(new Color(16737792));
-        for (int i = 0; i < snakeBody.size(); i++) {
+        for (int i = 0; i < snakeBody.size()-1; i++) {
             if (snakeBody.get(i) != null) {
-
                 snakeBody.get(i).draw(g);
             }
         }
-
-        // Draw food
+        //-------------DRAW-FOOD-------------
         if (food != null) {
             food.draw(g);
         }
-        // Draw x-axis grid 
+        //-------------DRAW-X-AXIS-GRID-------------
         g.setColor(new Color(1052945));
         for (int i = 0; i < WIDTH / blockSize; i++) {
             g.drawLine(i * blockSize, 0, i * blockSize, HEIGHT);
         }
-        // Draw y-axis grid 
+        //-------------DRAW-Y-AXIS-GRID-------------
         for (int i = 0; i < HEIGHT / blockSize; i++) {
             g.drawLine(0, i * blockSize, WIDTH, i * blockSize);
         }
+        //-------------LOGO-------------
         if (!running) {
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.PLAIN, 160));
@@ -709,7 +309,7 @@ public class Game extends JPanel implements Runnable {
         }
     }
 
-    //Runnable class abstract method
+    //------------------------------------------GAME------------------------------------------
     @Override
     public void run() {
         while (running) {
@@ -752,18 +352,10 @@ public class Game extends JPanel implements Runnable {
 
     //--------------------STEERING--------------------
     public void steering() {
-        if (right) {
-            xC++;
-        }
-        if (left) {
-            xC--;
-        }
-        if (up) {
-            yC--;
-        }
-        if (down) {
-            yC++;
-        }
+        if (right) xC++;
+        if (left)  xC--;
+        if (up)    yC--;
+        if (down)  yC++;
     }
 
     public void goUp() {
@@ -834,12 +426,36 @@ public class Game extends JPanel implements Runnable {
         }
 
         @Override
-        public void keyTyped(KeyEvent e) {
-        }
+        public void keyTyped(KeyEvent e) {}
 
         @Override
-        public void keyReleased(KeyEvent e) {
-        }
+        public void keyReleased(KeyEvent e) {}
 
+    }
+    //Printing game state as an array for each frame - for future use
+    public void generateArray() {
+        int[][] gameBoard = new int[40][40];
+        for (int i = 0; i < snakeBody.size(); i++) {
+            for (int j = 0; j <= (WIDTH / blockSize) - 1; j++) {
+                for (int k = 0; k <= (HEIGHT / blockSize) - 1; k++) {
+                    if (j == snakeBody.get(i).getxCoordinate() && k == snakeBody.get(i).getyCoordinate()) {
+                        gameBoard[j][k] = 2;
+                    }
+                    if (j == xC && k == yC) {
+                        gameBoard[j][k] = 1;
+                    }
+                    if (j == food.getxCoordinate() && k == food.getyCoordinate()) {
+                        gameBoard[j][k] = 5;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < gameBoard.length; i++) {
+            for (int j = 0; j < gameBoard.length; j++) {
+                System.out.print("[" + gameBoard[j][i] + "]");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }
