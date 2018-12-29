@@ -67,7 +67,7 @@ public class Game extends JPanel implements Runnable {
         ticks = 0;
         snakeSize = 4;
         score = 0;
-        countRuns = 1;
+        countRuns = 0;
         globalScore = 0;
         enableVision = false;
         drawVision = false;
@@ -258,9 +258,12 @@ public class Game extends JPanel implements Runnable {
         g.drawString(Integer.toString(score), 920, 100);
         g.setColor(Color.white);
         g.drawString("Score(avg):", 810, 135);
+        if(countRuns>0)
         g.drawString(Float.toString(globalScore / countRuns), 920, 135);
+        else
+        g.drawString(Float.toString(globalScore / 1), 920, 135);
         g.drawString("Runs:", 810, 170);
-        g.drawString(Integer.toString(countRuns), 920, 170);
+        g.drawString(Integer.toString(countRuns), 920, 170);   
         g.drawString("--------------------------", 810, 190);
 
         g.drawString("Shortcuts", 810, 235);
@@ -312,8 +315,10 @@ public class Game extends JPanel implements Runnable {
         //-------------DRAW-SNAKEBODY-------------
         g.setColor(new Color(16737792));
         for (int i = 0; i < snakeBody.size(); i++) {
-            if (snakeBody.get(i) != null) {
-                snakeBody.get(i).draw(g);
+            if(snakeBody.get(i).getxCoordinate()<40){
+                if (snakeBody.get(i) != null) {
+                    snakeBody.get(i).draw(g);
+                }
             }
         }
         //-------------DRAW-FOOD-------------
@@ -348,6 +353,7 @@ public class Game extends JPanel implements Runnable {
 
     public void start() {
         running = true;
+        countRuns++;
         thread = new Thread(this, "Game");
         thread.start();
 
@@ -368,7 +374,6 @@ public class Game extends JPanel implements Runnable {
         yC = 0;
         snakeSize = 4;
         score = 0;
-        countRuns++;
         snakeBody.removeAll(snakeBody);
         right = true;
         up = false;
