@@ -29,7 +29,7 @@ During each game it is possible to start coloring the snake depending on the obs
 ### Game modes
 
 #### Standard game
-This is the default game mode activated after pressing the **P** key. To restart the game it is necessary to press the **spacebar**. Use arrows to move the snake.
+This is the default game mode activated after pressing the **P** key. To restart the game it is necessary to press the **spacebar**. Use **arrows** to move the snake.
 
 ![standard game](https://github.com/DKrakowczyk/Snake/blob/master/_screenshots/standard.gif?raw=true)
 
